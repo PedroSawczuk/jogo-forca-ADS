@@ -1,0 +1,52 @@
+{% extends 'base.html' %} 
+
+{% load static %} 
+
+{% block title %}Desenvolvedores{%endblock title %}
+
+{% block main %}
+<div class="container">
+  <h1 class="text-center mb-4" style="margin: .5em 0 .5em 0;">Equipe de Desenvolvimento</h1>
+
+  <div class="row">
+    <div class="col-12 col-sm-6 col-md-4 mb-4">
+      <div class="card" style="width: 100%">
+        <img
+          class="card-img-top"
+          src="{% static 'image/jose-estevao.jpg' %}"
+          alt="Imagem do Tevinpvp"
+        />
+        <div class="card-body">
+          <h5 class="card-title">José Estevão</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 mb-4">
+      <div class="card" style="width: 100%">
+        <img
+          class="card-img-top"
+          src="{% static 'image/pedro-sawczuk.jpg' %}"
+          alt="Imagem do Pedrinpvp"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Pedro Sawczuk</h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4 mb-4">
+      <div class="card" style="width: 100%">
+        <img
+          class="card-img-top"
+          src="{% static 'image/reginaldo-junior.jpg' %}"
+          alt="Imagem do Junipvp"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Reginaldo Cardoso</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main %}

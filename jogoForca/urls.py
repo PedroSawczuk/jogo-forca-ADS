@@ -22,7 +22,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),  
     path('', include('core.urls')),  
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Servir arquivos de mídia e estáticos durante o desenvolvimento
 if settings.DEBUG:
