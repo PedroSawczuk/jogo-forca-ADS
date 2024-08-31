@@ -7,7 +7,8 @@ Aplicação em django criado para a atividade final de Programação IV do curso
 
 - **Python 🐍**
 - **Django 💻**
-- **SQLite 🗄**
+- **SQLite 🗄️**
+- **Bootstrap 🎨**
 - **PythonAnyWhere 🌐**
   
 ## Como rodar 🚀
