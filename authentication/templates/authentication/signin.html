@@ -1,0 +1,9 @@
+<section class="section">
+  <div class="container">
+    <h1 class="title">Sign In</h1>
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button class="button is-primary" type="submit">Sign In</button>
+    </form>
+  </div>
+</section>
