@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
+from authentication.views import LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),  
     path('', include('core.urls')),  
     path('auth/', include('authentication.urls')),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Servir arquivos de mídia e estáticos durante o desenvolvimento

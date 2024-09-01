@@ -8,7 +8,7 @@ from .forms import SignupForm, SigninForm
 class SignupView(FormView):
     template_name = 'authentication/signup.html'
     form_class = SignupForm
-    success_url = reverse_lazy('homePage')  # Redireciona para homePage após sucesso
+    success_url = reverse_lazy('signin')  # Redireciona para a página de login após sucesso
 
     def form_valid(self, form):
         user = form.save()
@@ -21,7 +21,7 @@ class SignupView(FormView):
 class SigninView(FormView):
     template_name = 'authentication/signin.html'
     form_class = SigninForm
-    success_url = reverse_lazy('homePage')  # Redireciona para homePage após sucesso
+    success_url = reverse_lazy('homePage')  
 
     def form_valid(self, form):
         username = form.cleaned_data['username']
@@ -32,4 +32,4 @@ class SigninView(FormView):
         return super().form_valid(form)
 
 class LogoutView(DjangoLogoutView):
-    next_page = reverse_lazy('homePage')  # Redireciona para homePage após logout
+    next_page = reverse_lazy('homePage')
