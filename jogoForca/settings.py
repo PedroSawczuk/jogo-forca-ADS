@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     # Meus Apps
     'core',
+    'authentication',
+
 ]
 
 MIDDLEWARE = [
@@ -94,6 +96,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -131,3 +136,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# settings.py
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
