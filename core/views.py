@@ -60,7 +60,7 @@ class AdministrarTemasPageView(CreateView, ListView):
 
         return context
 
-class EditarTemaView(UpdateView):
+class EditarTemaPageView(UpdateView):
     model = Tema
     form_class = TemaForm
     template_name = 'professor/editarTemas.html'
@@ -74,7 +74,7 @@ class EditarTemaView(UpdateView):
 
         return context
 
-class DeletarTemaView(DeleteView):
+class DeletarTemaPageView(DeleteView):
     model = Tema
     template_name = 'professor/confirmarExcluirTemas.html'
     success_url = reverse_lazy('administrarTemasPage')
