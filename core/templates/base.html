@@ -11,7 +11,7 @@
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
   </head>
-  <body>
+  <body>  
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="#">Jogo da Forca ADS</a>
       <div class="collapse navbar-collapse">
@@ -31,7 +31,7 @@
 
           {% if user.is_authenticated %} {% if is_professor %}
           <li class="nav-item">
-            <a class="btn btn-warning" href="#" style="margin-right: 0.5em"
+            <a class="btn btn-warning" href="{% url 'professorGeralPage' %}" style="margin-right: 0.5em"
               >Administrar Temas</a
             >
           </li>
