@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import *
 from django.urls import reverse_lazy
 from .models import *
@@ -42,7 +42,7 @@ class ProfessorGeralPageView(TemplateView):
 class AdministrarTemasPageView(CreateView, ListView):
     model = Tema
     form_class = TemaForm
-    template_name = 'professor/temasPage.html'
+    template_name = 'professor/temas/temasPage.html'
     success_url = reverse_lazy('administrarTemasPage')
 
     def get_queryset(self):
@@ -59,11 +59,11 @@ class AdministrarTemasPageView(CreateView, ListView):
         context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
 
         return context
-
+    
 class EditarTemaPageView(UpdateView):
     model = Tema
     form_class = TemaForm
-    template_name = 'professor/editarTemas.html'
+    template_name = 'professor/temas/editarTemas.html'
     success_url = reverse_lazy('administrarTemasPage')
 
     def get_context_data(self, **kwargs):
@@ -73,10 +73,9 @@ class EditarTemaPageView(UpdateView):
         context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
 
         return context
-
 class DeletarTemaPageView(DeleteView):
     model = Tema
-    template_name = 'professor/confirmarExcluirTemas.html'
+    template_name = 'professor/temas/confirmarExcluirTemas.html'
     success_url = reverse_lazy('administrarTemasPage')
 
     def get_context_data(self, **kwargs):
@@ -86,3 +85,33 @@ class DeletarTemaPageView(DeleteView):
         context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
 
         return context
+
+class AdministrarPalavrasPageView(CreateView, ListView):
+    model = Palavra
+    form_class = PalavraForm
+    template_name = 'professor/palavras/palavrasPage.html'
+    success_url = reverse_lazy('administrarPalavrasPage')
+
+    def get_queryset(self):
+        return Palavra.objects.filter(tema__professor=self.request.user)
+
+    def form_valid(self, form):
+        form.instance.tema = get_object_or_404(Tema, pk=self.request.POST.get('tema'))
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        return context
+
+
+class EditarPalavraPageView(UpdateView):
+    model = Palavra
+    form_class = PalavraForm
+    template_name = 'professor/palavras/editarPalavras.html'
+    success_url = reverse_lazy('administrarPalavrasPage')
+
+class DeletarPalavraPageView(DeleteView):
+    model = Palavra
+    template_name = 'professor/palavras/confirmarExcluirPalavras.html'
+    success_url = reverse_lazy('administrarPalavrasPage')

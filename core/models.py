@@ -12,7 +12,6 @@ class Tema(models.Model):
 class Palavra(models.Model):
     tema = models.ForeignKey(Tema, on_delete=models.CASCADE, related_name='palavras')
     palavra = models.CharField(max_length=100)
-    texto = models.TextField(blank=True, null=True)
     dica = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
