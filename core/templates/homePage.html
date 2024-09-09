@@ -1,3 +1,4 @@
+<!-- core/templates/core/homePage.html -->
 {% extends "base.html" %}
 
 {% block title %}
@@ -5,5 +6,23 @@
 {% endblock title %}
 
 {% block main %}
-  Jogo da Forca com ADS
+<div class="container">
+  <h1 class="text-center mb-4">Jogo da Forca com ADS</h1>
+
+  <div class="row justify-content-center">
+    {% for tema in temas %}
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ tema.nome }}</h5>
+          <p class="card-text">{{ tema.descricao }}</p>
+          <a href="{% url 'temaDetalhes' tema.id %}" class="btn btn-primary">Sobre o Tema</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center">Nenhum tema disponível no momento.</p>
+    {% endfor %}
+  </div>
+</div>
 {% endblock main %}

@@ -3,6 +3,8 @@ from .views import *
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="homePage"),
+    path('tema/<int:pk>/', TemaDetalhesView.as_view(), name='temaDetalhes'),
+
     path("desenvolvedores", DesenvolvedoresPageView.as_view(), name="desenvolvedoresPage"),
     path("professor/pagina-geral", ProfessorGeralPageView.as_view(), name="professorGeralPage"),
     path("professor/tema/administrar-temas", AdministrarTemasPageView.as_view(), name="administrarTemasPage"),

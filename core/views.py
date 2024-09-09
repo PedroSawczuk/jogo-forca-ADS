@@ -7,14 +7,20 @@ from .forms import *
 class HomePageView(TemplateView):
     template_name = "homePage.html"
 
-
-    # função para verificar se o usuário é professor
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-
         context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
-
+        context['temas'] = Tema.objects.all()
+        return context
+    
+class TemaDetalhesView(DetailView):
+    model = Tema
+    template_name = 'temaDetalhe.html'
+    context_object_name = 'tema'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         return context
 
 class DesenvolvedoresPageView(TemplateView):
