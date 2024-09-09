@@ -5,6 +5,7 @@ from .models import *
 from .forms import *
 import random
 from django.http import HttpResponseRedirect, JsonResponse
+import unicodedata
 
 class HomePageView(TemplateView):
     template_name = "homePage.html"
@@ -124,6 +125,12 @@ class DeletarPalavraPageView(DeleteView):
     success_url = reverse_lazy('administrarPalavrasPage')
 
 
+
+def normalize_accented_char(char):
+    """Remove accents from characters for comparison."""
+    normalized_char = unicodedata.normalize('NFD', char)
+    return ''.join(c for c in normalized_char if unicodedata.category(c) != 'Mn')
+
 class ForcaGameView(TemplateView):
     template_name = 'jogo/forcaPage.html'
 
@@ -171,11 +178,15 @@ class ForcaGameView(TemplateView):
             mensagem = ""
 
             erros = self.request.session.get('erros', 0)
+            
+            # Normaliza a letra inserida e a palavra
+            letra_normalizada = normalize_accented_char(letra)
+            palavra_normalizada = normalize_accented_char(palavra)
 
-            if letra in palavra:
+            if letra_normalizada in palavra_normalizada:
                 for idx, char in enumerate(palavra):
-                    if char == letra:
-                        nova_palavra_mascarada[idx] = letra
+                    if normalize_accented_char(char) == letra_normalizada:
+                        nova_palavra_mascarada[idx] = char
                 palavra_mascarada = ''.join(nova_palavra_mascarada)
                 self.request.session['palavra_mascarada'] = palavra_mascarada
                 mensagem = "Letra correta!"
@@ -217,6 +228,7 @@ class ForcaGameView(TemplateView):
             })
 
         return JsonResponse({'mensagem': 'Erro: Nenhuma palavra selecionada.'}, status=400)
+
 
 class WinPageView(TemplateView):
     template_name = 'jogo/winPage.html'

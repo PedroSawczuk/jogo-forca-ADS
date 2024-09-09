@@ -5,9 +5,11 @@
 {% endblock title %}
 
 {% block main %}
-<div class="container">
-  <h1 class="text-center">Que pena!</h1>
-  <p class="text-center">Você não conseguiu acertar a palavra.</p>
-  <a href="{% url 'homePage' %}" class="btn btn-primary">Voltar ao Início</a>
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h1 class="display-3 text-danger">Que pena!</h1>
+    <p class="lead">Você não conseguiu acertar a palavra.</p>
+    <a href="{% url 'homePage' %}" class="btn btn-primary btn-lg">Voltar ao Início</a>
+  </div>
 </div>
 {% endblock main %}
