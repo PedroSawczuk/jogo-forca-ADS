@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Jogo da Forca - Tema: {{ tema.nome }}
+{% endblock title %}
+
+{% block main %}
+<div class="container">
+  <h1 class="text-center mb-4">Tema: {{ tema.nome }}</h1>
+  <p class="text-center">{{ tema.descricao }}</p>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <p class="text-center">Dica: {{ palavra.dica }}</p>
+      <p class="text-center">Palavra: <span id="palavra">{{ palavra_mascarada }}</span></p>
+      <p class="text-center">Tentativas Restantes: <span id="tentativas">{{ tentativas_restantes }}</span></p>
+
+      <form id="forcaForm" method="post" action="{% url 'forcaPage' tema.pk %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <input type="text" name="letra" id="inputLetra" class="form-control" maxlength="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('forcaForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Atualiza a palavra mascarada
+          document.getElementById('palavra').textContent = data.palavra_mascarada;
+          // Atualiza as tentativas restantes
+          document.getElementById('tentativas').textContent = data.tentativas_restantes;
+          // Limpa o campo de input
+          document.getElementById('inputLetra').value = '';
+  
+          // Redireciona conforme necessário
+          if (data.redirect) {
+              window.location.href = data.url;
+          }
+      });
+  });
+  </script>
+{% endblock main %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Você Venceu!
+{% endblock title %}
+
+{% block main %}
+<div class="container">
+  <h1 class="text-center">Parabéns!</h1>
+  <p class="text-center">Você acertou todas as letras!</p>
+  <a href="{% url 'homePage' %}" class="btn btn-primary">Voltar ao Início</a>
+</div>
+{% endblock main %}
