@@ -12,6 +12,8 @@ from django.http import HttpResponse
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 
 class HomePageView(ProfessorContextMixin, TemplateView):
     template_name = "homePage.html"
@@ -206,14 +208,16 @@ class WinPageView(ProfessorContextMixin, TemplateView):
 class LosePageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/losePage.html'
 
-class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView):
+
+
+class RelatorioAtividadeView(LoginRequiredMixin, ListView):
     template_name = 'professor/relatorioAtividade.html'
     context_object_name = 'atividades'
     model = Atividade
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['temas'] = Tema.objects.all()
+        context['temas'] = Tema.objects.filter(professor=self.request.user)
         atividades = self.get_queryset()
         context['atividades_vazias'] = not atividades.exists()
         return context
@@ -222,14 +226,17 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
         tema_id = self.request.GET.get('tema')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
-        
-        queryset = Atividade.objects.all()
-        
+
+        queryset = Atividade.objects.filter(tema__professor=self.request.user)
+
         if tema_id:
             queryset = queryset.filter(tema_id=tema_id)
         if data_inicio and data_fim:
             queryset = queryset.filter(data__range=[data_inicio, data_fim])
         
+        # Ordenar por nome de usuário em ordem alfabética
+        queryset = queryset.order_by('aluno__username')
+
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -240,20 +247,70 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
     def exportar_pdf(self):
         atividades = self.get_queryset()
         buffer = BytesIO()
-        p = canvas.Canvas(buffer, pagesize=letter)
-        width, height = letter
-
-        p.drawString(100, height - 100, "Relatório de Atividades")
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        content = []
         
-        if not atividades.exists():
-            p.drawString(100, height - 120, "Nenhuma atividade registrada.")
-        else:
-            y = height - 120
-            for atividade in atividades:
-                p.drawString(100, y, f"Aluno: {atividade.aluno.username}, Tema: {atividade.tema.nome}, Data: {atividade.data}, Resultado: {atividade.resultado}")
-                y -= 20
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            name='TitleStyle',
+            parent=styles['Title'],
+            fontName='Helvetica-Bold',
+            fontSize=18,
+            alignment=1,
+            spaceAfter=20
+        )
+        subtitle_style = ParagraphStyle(
+            name='SubtitleStyle',
+            fontName='Helvetica',
+            fontSize=14,
+            alignment=1,
+            spaceAfter=10
+        )
+        normal_style = ParagraphStyle(
+            name='NormalStyle',
+            fontName='Helvetica',
+            fontSize=10,
+            alignment=0,
+            spaceAfter=10
+        )
+        
+        # Adiciona o título
+        title = Paragraph("Relatório de Atividades", title_style)
+        content.append(title)
 
-        p.showPage()
-        p.save()
+        if not atividades.exists():
+            no_data = Paragraph("Nenhuma atividade registrada.", normal_style)
+            content.append(no_data)
+        else:
+            content.append(Paragraph("<br/><br/>", normal_style))
+            
+            # Adiciona o cabeçalho da tabela
+            data = [['Aluno', 'Tema', 'Data', 'Resultado']]
+            
+            for atividade in atividades:
+                data.append([
+                    atividade.aluno.username,
+                    atividade.tema.nome,
+                    atividade.data.strftime('%d/%m/%Y'),
+                    atividade.resultado
+                ])
+
+            table = Table(data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), '#0044cc'),
+                ('TEXTCOLOR', (0, 0), (-1, 0), '#ffffff'),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('BACKGROUND', (0, 1), (-1, -1), '#f4f4f4'),
+                ('GRID', (0, 0), (-1, -1), 0.5, '#dddddd'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), '#fafafa'),
+            ]))
+            
+            content.append(table)
+
+        doc.build(content)
         buffer.seek(0)
         return HttpResponse(buffer, content_type='application/pdf')
