@@ -1,9 +1,16 @@
+<!-- Atualize o template de administração de temas com o botão "Relatórios" -->
 {% extends "base.html" %}
 {% block title %} Administrar Temas {% endblock title %}
 
 {% block main %}
 <div class="container">
   <h1 class="text-center mb-4">Administrar Temas</h1>
+
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-12 text-center">
+      <a href="{% url 'relatorioAtividade' %}" class="btn btn-info">Relatórios</a>
+    </div>
+  </div>
 
   <div class="row justify-content-center">
     <div class="col-md-6">

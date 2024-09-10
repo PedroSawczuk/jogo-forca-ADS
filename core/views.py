@@ -182,3 +182,74 @@ class WinPageView(ProfessorContextMixin, TemplateView):
 
 class LosePageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/losePage.html'
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .models import Atividade, Tema
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .models import Atividade, Tema
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .models import Atividade, Tema
+
+class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView):
+    template_name = 'professor/relatorioAtividade.html'
+    context_object_name = 'atividades'
+    model = Atividade
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['temas'] = Tema.objects.all()
+        return context
+
+    def get_queryset(self):
+        tema_id = self.request.GET.get('tema')
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+        
+        queryset = Atividade.objects.all()
+        
+        if tema_id:
+            queryset = queryset.filter(tema_id=tema_id)
+        if data_inicio and data_fim:
+            queryset = queryset.filter(data__range=[data_inicio, data_fim])
+        
+        return queryset
+
+    def get(self, request, *args, **kwargs):
+        if 'exportar_pdf' in request.GET:
+            return self.exportar_pdf()
+        return super().get(request, *args, **kwargs)
+
+    def exportar_pdf(self):
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+
+        atividades = self.get_queryset()
+
+        p.drawString(100, height - 100, "Relatório de Atividades")
+        y = height - 120
+        for atividade in atividades:
+            p.drawString(100, y, f"Aluno: {atividade.aluno.username}, Tema: {atividade.tema.nome}, Data: {atividade.data}")
+            y -= 20
+
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+        return HttpResponse(buffer, content_type='application/pdf')

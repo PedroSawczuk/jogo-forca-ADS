@@ -13,6 +13,8 @@ urlpatterns = [
     path("professor/tema/administrar-temas", AdministrarTemasPageView.as_view(), name="administrarTemasPage"),
     path("professor/tema/<int:pk>/editar/", EditarTemaPageView.as_view(), name="editarTema"),
     path("professor/tema/<int:pk>/deletar/", DeletarTemaPageView.as_view(), name="deletarTema"),
+    
+    path('professor/relatorio-atividade/', RelatorioAtividadeView.as_view(), name='relatorioAtividade'),
 
     path('professor/palavras/administrar-palavras', AdministrarPalavrasPageView.as_view(), name='administrarPalavrasPage'),
     path('professor/palavra/editar-palavra/<int:pk>/', EditarPalavraPageView.as_view(), name='editarPalavra'),
