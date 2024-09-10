@@ -149,6 +149,14 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
             if '_' not in palavra_mascarada:
                 del self.request.session['palavra_escolhida']
                 del self.request.session['erros']
+                
+                # Registro de atividade
+                Atividade.objects.create(
+                    aluno=self.request.user,
+                    tema=Palavra.objects.get(id=palavra_escolhida_id).tema,
+                    resultado='vitoria'
+                )
+
                 return JsonResponse({
                     'palavra_mascarada': palavra_mascarada,
                     'tentativas_restantes': tentativas_restantes,
@@ -160,6 +168,14 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
             if tentativas_restantes <= 0:
                 del self.request.session['palavra_escolhida']
                 del self.request.session['erros']
+                
+                # Registro de atividade
+                Atividade.objects.create(
+                    aluno=self.request.user,
+                    tema=Palavra.objects.get(id=palavra_escolhida_id).tema,
+                    resultado='derrota'
+                )
+
                 return JsonResponse({
                     'palavra_mascarada': palavra_mascarada,
                     'tentativas_restantes': tentativas_restantes,
@@ -191,22 +207,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from .models import Atividade, Tema
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
-from django.http import HttpResponse
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from .models import Atividade, Tema
-
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
-from django.http import HttpResponse
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from .models import Atividade, Tema
-
 class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView):
     template_name = 'professor/relatorioAtividade.html'
     context_object_name = 'atividades'
@@ -221,14 +221,14 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
         tema_id = self.request.GET.get('tema')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
-        
+
         queryset = Atividade.objects.all()
-        
+
         if tema_id:
             queryset = queryset.filter(tema_id=tema_id)
         if data_inicio and data_fim:
             queryset = queryset.filter(data__range=[data_inicio, data_fim])
-        
+
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -246,10 +246,17 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
         p.drawString(100, height - 100, "Relatório de Atividades")
         y = height - 120
         for atividade in atividades:
-            p.drawString(100, y, f"Aluno: {atividade.aluno.username}, Tema: {atividade.tema.nome}, Data: {atividade.data}")
+            p.drawString(100, y, f"Aluno: {atividade.aluno.username}")
+            p.drawString(300, y, f"Tema: {atividade.tema.nome}")
+            p.drawString(500, y, f"Data: {atividade.data.strftime('%d/%m/%Y %H:%M')}")
             y -= 20
+            if y < 100:  
+                p.showPage()
+                y = height - 100
 
         p.showPage()
         p.save()
         buffer.seek(0)
-        return HttpResponse(buffer, content_type='application/pdf')
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="relatorio_atividades.pdf"'
+        return response
