@@ -150,10 +150,10 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
                 del self.request.session['palavra_escolhida']
                 del self.request.session['erros']
                 
-                # Registro de atividade
+                # Registro de atividade com resultado de vitória
                 Atividade.objects.create(
                     aluno=self.request.user,
-                    tema=Palavra.objects.get(id=palavra_escolhida_id).tema,
+                    tema=palavra_escolhida.tema,
                     resultado='vitoria'
                 )
 
@@ -169,10 +169,10 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
                 del self.request.session['palavra_escolhida']
                 del self.request.session['erros']
                 
-                # Registro de atividade
+                # Registro de atividade com resultado de derrota
                 Atividade.objects.create(
                     aluno=self.request.user,
-                    tema=Palavra.objects.get(id=palavra_escolhida_id).tema,
+                    tema=palavra_escolhida.tema,
                     resultado='derrota'
                 )
 
@@ -192,6 +192,7 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
             })
 
         return JsonResponse({'mensagem': 'Erro: Nenhuma palavra selecionada.'}, status=400)
+
 
 class WinPageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/winPage.html'
@@ -215,20 +216,22 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['temas'] = Tema.objects.all()
+        atividades = self.get_queryset()
+        context['atividades_vazias'] = not atividades.exists()
         return context
 
     def get_queryset(self):
         tema_id = self.request.GET.get('tema')
         data_inicio = self.request.GET.get('data_inicio')
         data_fim = self.request.GET.get('data_fim')
-
+        
         queryset = Atividade.objects.all()
-
+        
         if tema_id:
             queryset = queryset.filter(tema_id=tema_id)
         if data_inicio and data_fim:
             queryset = queryset.filter(data__range=[data_inicio, data_fim])
-
+        
         return queryset
 
     def get(self, request, *args, **kwargs):
@@ -237,26 +240,32 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
         return super().get(request, *args, **kwargs)
 
     def exportar_pdf(self):
+        atividades = self.get_queryset()
+        if not atividades.exists():
+            buffer = BytesIO()
+            p = canvas.Canvas(buffer, pagesize=letter)
+            width, height = letter
+
+            p.drawString(100, height - 100, "Relatório de Atividades")
+            p.drawString(100, height - 120, "Nenhuma atividade encontrada.")
+
+            p.showPage()
+            p.save()
+            buffer.seek(0)
+            return HttpResponse(buffer, content_type='application/pdf')
+
+        # Se há atividades, gera o relatório normalmente
         buffer = BytesIO()
         p = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
 
-        atividades = self.get_queryset()
-
         p.drawString(100, height - 100, "Relatório de Atividades")
         y = height - 120
         for atividade in atividades:
-            p.drawString(100, y, f"Aluno: {atividade.aluno.username}")
-            p.drawString(300, y, f"Tema: {atividade.tema.nome}")
-            p.drawString(500, y, f"Data: {atividade.data.strftime('%d/%m/%Y %H:%M')}")
+            p.drawString(100, y, f"Aluno: {atividade.aluno.username}, Tema: {atividade.tema.nome}, Data: {atividade.data}, Resultado: {atividade.resultado}")
             y -= 20
-            if y < 100:  
-                p.showPage()
-                y = height - 100
 
         p.showPage()
         p.save()
         buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="relatorio_atividades.pdf"'
-        return response
+        return HttpResponse(buffer, content_type='application/pdf')

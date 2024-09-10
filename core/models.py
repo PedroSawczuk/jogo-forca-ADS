@@ -29,4 +29,8 @@ class Atividade(models.Model):
     aluno = models.ForeignKey(User, on_delete=models.CASCADE)
     tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
     data = models.DateTimeField(auto_now_add=True)
-    resultado = models.CharField(max_length=100, default='Pendente')  # Valor padrão definido aqui
+    resultado = models.CharField(max_length=20, choices=[('vitoria', 'Vitória'), ('derrota', 'Derrota')])
+
+    def __str__(self):
+        return f"{self.aluno.username} - {self.tema.nome} - {self.resultado}"
+
