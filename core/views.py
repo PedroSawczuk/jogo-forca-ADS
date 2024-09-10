@@ -85,12 +85,14 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tema = get_object_or_404(Tema, pk=self.kwargs['pk'])
-        palavras = tema.palavras.all()
+        palavras = list(tema.palavras.all())  # Converter para lista
+
         palavra_escolhida_id = self.request.session.get('palavra_escolhida')
 
         if not palavra_escolhida_id:
-            palavra_escolhida = random.choice(palavras) if palavras.exists() else None
-            if palavra_escolhida:
+            if palavras:
+                random.shuffle(palavras)  # Embaralhar a lista
+                palavra_escolhida = palavras[0]  # Selecionar a primeira palavra
                 self.request.session['palavra_escolhida'] = palavra_escolhida.id
                 self.request.session['erros'] = 0  # Inicializa o contador de erros
             else:
@@ -192,7 +194,6 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
             })
 
         return JsonResponse({'mensagem': 'Erro: Nenhuma palavra selecionada.'}, status=400)
-
 
 class WinPageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/winPage.html'
