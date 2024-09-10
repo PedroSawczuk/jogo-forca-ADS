@@ -6,49 +6,28 @@ from .forms import *
 import random
 from django.http import HttpResponseRedirect, JsonResponse
 import unicodedata
+from .mixins import ProfessorContextMixin
 
-class HomePageView(TemplateView):
+class HomePageView(ProfessorContextMixin, TemplateView):
     template_name = "homePage.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
         context['temas'] = Tema.objects.all()
         return context
-    
-class TemaDetalhesView(DetailView):
+
+class TemaDetalhesView(ProfessorContextMixin, DetailView):
     model = Tema
     template_name = 'temaDetalhe.html'
     context_object_name = 'tema'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
-class DesenvolvedoresPageView(TemplateView):
+class DesenvolvedoresPageView(ProfessorContextMixin, TemplateView):
     template_name = "desenvolvedoresPage.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
-
-        return context
-
-class ProfessorGeralPageView(TemplateView):
+class ProfessorGeralPageView(ProfessorContextMixin, TemplateView):
     template_name = "professor/paginaGeral.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
-
-        return context
-
-class AdministrarTemasPageView(CreateView, ListView):
+class AdministrarTemasPageView(ProfessorContextMixin, CreateView, ListView):
     model = Tema
     form_class = TemaForm
     template_name = 'professor/temas/temasPage.html'
@@ -60,42 +39,19 @@ class AdministrarTemasPageView(CreateView, ListView):
     def form_valid(self, form):
         form.instance.professor = self.request.user
         return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
 
-        context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
-
-        return context
-    
-class EditarTemaPageView(UpdateView):
+class EditarTemaPageView(ProfessorContextMixin, UpdateView):
     model = Tema
     form_class = TemaForm
     template_name = 'professor/temas/editarTemas.html'
     success_url = reverse_lazy('administrarTemasPage')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
-
-        return context
-class DeletarTemaPageView(DeleteView):
+class DeletarTemaPageView(ProfessorContextMixin, DeleteView):
     model = Tema
     template_name = 'professor/temas/confirmarExcluirTemas.html'
     success_url = reverse_lazy('administrarTemasPage')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-
-        context['is_professor'] = user.is_authenticated and user.groups.filter(name='professores').exists()
-
-        return context
-
-class AdministrarPalavrasPageView(CreateView, ListView):
+class AdministrarPalavrasPageView(ProfessorContextMixin, CreateView, ListView):
     model = Palavra
     form_class = PalavraForm
     template_name = 'professor/palavras/palavrasPage.html'
@@ -107,31 +63,23 @@ class AdministrarPalavrasPageView(CreateView, ListView):
     def form_valid(self, form):
         form.instance.tema = get_object_or_404(Tema, pk=self.request.POST.get('tema'))
         return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        return context
 
-class EditarPalavraPageView(UpdateView):
+class EditarPalavraPageView(ProfessorContextMixin, UpdateView):
     model = Palavra
     form_class = PalavraForm
     template_name = 'professor/palavras/editarPalavras.html'
     success_url = reverse_lazy('administrarPalavrasPage')
 
-class DeletarPalavraPageView(DeleteView):
+class DeletarPalavraPageView(ProfessorContextMixin, DeleteView):
     model = Palavra
     template_name = 'professor/palavras/confirmarExcluirPalavras.html'
     success_url = reverse_lazy('administrarPalavrasPage')
 
-
-
 def normalize_accented_char(char):
-    """Remove accents from characters for comparison."""
     normalized_char = unicodedata.normalize('NFD', char)
     return ''.join(c for c in normalized_char if unicodedata.category(c) != 'Mn')
 
-class ForcaGameView(TemplateView):
+class ForcaGameView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/forcaPage.html'
 
     def get_context_data(self, **kwargs):
@@ -178,7 +126,7 @@ class ForcaGameView(TemplateView):
             mensagem = ""
 
             erros = self.request.session.get('erros', 0)
-            
+
             # Normaliza a letra inserida e a palavra
             letra_normalizada = normalize_accented_char(letra)
             palavra_normalizada = normalize_accented_char(palavra)
@@ -229,9 +177,8 @@ class ForcaGameView(TemplateView):
 
         return JsonResponse({'mensagem': 'Erro: Nenhuma palavra selecionada.'}, status=400)
 
-
-class WinPageView(TemplateView):
+class WinPageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/winPage.html'
 
-class LosePageView(TemplateView):
+class LosePageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/losePage.html'
