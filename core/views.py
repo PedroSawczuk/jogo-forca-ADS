@@ -7,6 +7,11 @@ import random
 from django.http import HttpResponseRedirect, JsonResponse
 import unicodedata
 from .mixins import ProfessorContextMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 class HomePageView(ProfessorContextMixin, TemplateView):
     template_name = "homePage.html"
@@ -201,14 +206,6 @@ class WinPageView(ProfessorContextMixin, TemplateView):
 class LosePageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/losePage.html'
 
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
-from django.http import HttpResponse
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from .models import Atividade, Tema
-
 class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView):
     template_name = 'professor/relatorioAtividade.html'
     context_object_name = 'atividades'
@@ -242,29 +239,19 @@ class RelatorioAtividadeView(LoginRequiredMixin, ProfessorContextMixin, ListView
 
     def exportar_pdf(self):
         atividades = self.get_queryset()
-        if not atividades.exists():
-            buffer = BytesIO()
-            p = canvas.Canvas(buffer, pagesize=letter)
-            width, height = letter
-
-            p.drawString(100, height - 100, "Relatório de Atividades")
-            p.drawString(100, height - 120, "Nenhuma atividade encontrada.")
-
-            p.showPage()
-            p.save()
-            buffer.seek(0)
-            return HttpResponse(buffer, content_type='application/pdf')
-
-        # Se há atividades, gera o relatório normalmente
         buffer = BytesIO()
         p = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
 
         p.drawString(100, height - 100, "Relatório de Atividades")
-        y = height - 120
-        for atividade in atividades:
-            p.drawString(100, y, f"Aluno: {atividade.aluno.username}, Tema: {atividade.tema.nome}, Data: {atividade.data}, Resultado: {atividade.resultado}")
-            y -= 20
+        
+        if not atividades.exists():
+            p.drawString(100, height - 120, "Nenhuma atividade registrada.")
+        else:
+            y = height - 120
+            for atividade in atividades:
+                p.drawString(100, y, f"Aluno: {atividade.aluno.username}, Tema: {atividade.tema.nome}, Data: {atividade.data}, Resultado: {atividade.resultado}")
+                y -= 20
 
         p.showPage()
         p.save()

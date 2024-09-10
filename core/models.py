@@ -17,13 +17,6 @@ class Palavra(models.Model):
     def __str__(self):
         return self.palavra
 
-class Atividade(models.Model):
-    aluno = models.ForeignKey(User, on_delete=models.CASCADE)
-    tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
-    data = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.aluno.username} - {self.tema.nome} - {self.data}"
     
 class Atividade(models.Model):
     aluno = models.ForeignKey(User, on_delete=models.CASCADE)
