@@ -20,7 +20,19 @@ class HomePageView(ProfessorContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['temas'] = Tema.objects.all()
+        professor_id = self.request.GET.get('professor')
+        tema_id = self.request.GET.get('tema')
+
+        if professor_id:
+            temas = Tema.objects.filter(professor_id=professor_id)
+        else:
+            temas = Tema.objects.all()
+
+        if tema_id:
+            temas = temas.filter(id=tema_id)
+
+        context['temas'] = temas
+        context['professores'] = User.objects.filter(groups__name='professores')
         return context
 
 class TemaDetalhesView(ProfessorContextMixin, DetailView):
