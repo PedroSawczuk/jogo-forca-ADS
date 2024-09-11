@@ -17,5 +17,10 @@ class PalavraForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        professor = kwargs.pop('professor', None)  
         super().__init__(*args, **kwargs)
+
+        if professor:
+            self.fields['tema'].queryset = Tema.objects.filter(professor=professor)
+
         self.fields['dica'].required = False

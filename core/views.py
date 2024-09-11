@@ -65,10 +65,18 @@ class AdministrarPalavrasPageView(ProfessorContextMixin, CreateView, ListView):
     success_url = reverse_lazy('administrarPalavrasPage')
 
     def get_queryset(self):
-        return Palavra.objects.filter(tema__professor=self.request.user)
+        temas_do_professor = Tema.objects.filter(professor=self.request.user)
+        return Palavra.objects.filter(tema__in=temas_do_professor)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Passa o professor autenticado para o formulário
+        form = PalavraForm(professor=self.request.user)
+        return form
 
     def form_valid(self, form):
-        form.instance.tema = get_object_or_404(Tema, pk=self.request.POST.get('tema'))
+        tema = get_object_or_404(Tema, pk=self.request.POST.get('tema'), professor=self.request.user)
+        form.instance.tema = tema
         return super().form_valid(form)
 
 class EditarPalavraPageView(ProfessorContextMixin, UpdateView):
@@ -206,8 +214,6 @@ class WinPageView(ProfessorContextMixin, TemplateView):
 class LosePageView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/losePage.html'
 
-
-
 class RelatorioAtividadeView(ProfessorContextMixin,  ListView):
     template_name = 'professor/relatorioAtividade.html'
     context_object_name = 'atividades'
@@ -232,7 +238,6 @@ class RelatorioAtividadeView(ProfessorContextMixin,  ListView):
         if data_inicio and data_fim:
             queryset = queryset.filter(data__range=[data_inicio, data_fim])
         
-        # Ordenar por nome de usuário em ordem alfabética
         queryset = queryset.order_by('aluno__username')
 
         return queryset

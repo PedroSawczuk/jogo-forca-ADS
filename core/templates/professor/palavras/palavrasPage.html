@@ -18,6 +18,7 @@
   <div class="row mt-5">
     <div class="col-md-12">
       <h2>Palavras Existentes</h2>
+      {% if object_list %}
       <table class="table table-bordered table-striped">
         <thead>
           <tr>
@@ -41,6 +42,9 @@
           {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <p class="text-center">Nenhuma palavra encontrada para este professor.</p>
+      {% endif %}
     </div>
   </div>
 </div>
