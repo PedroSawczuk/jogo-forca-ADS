@@ -92,16 +92,16 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tema = get_object_or_404(Tema, pk=self.kwargs['pk'])
-        palavras = list(tema.palavras.all())  # Converter para lista
+        palavras = list(tema.palavras.all())
 
         palavra_escolhida_id = self.request.session.get('palavra_escolhida')
 
         if not palavra_escolhida_id:
             if palavras:
-                random.shuffle(palavras)  # Embaralhar a lista
-                palavra_escolhida = palavras[0]  # Selecionar a primeira palavra
+                random.shuffle(palavras)
+                palavra_escolhida = palavras[0]
                 self.request.session['palavra_escolhida'] = palavra_escolhida.id
-                self.request.session['erros'] = 0  # Inicializa o contador de erros
+                self.request.session['erros'] = 0
             else:
                 palavra_escolhida = None
         else:
@@ -136,7 +136,6 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
 
             erros = self.request.session.get('erros', 0)
 
-            # Normaliza a letra inserida e a palavra
             letra_normalizada = normalize_accented_char(letra)
             palavra_normalizada = normalize_accented_char(palavra)
 
@@ -152,19 +151,18 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
                 self.request.session['erros'] = erros
                 mensagem = "Letra incorreta!"
 
-            tentativas_restantes = 6 - erros
+            tentativas_restantes = 5 - erros
 
-            # Verificar se a palavra foi completada ou se as tentativas acabaram
             if '_' not in palavra_mascarada:
                 del self.request.session['palavra_escolhida']
                 del self.request.session['erros']
-                
-                # Registro de atividade com resultado de vitória
-                Atividade.objects.create(
-                    aluno=self.request.user,
-                    tema=palavra_escolhida.tema,
-                    resultado='vitoria'
-                )
+
+                if request.user.is_authenticated:
+                    Atividade.objects.create(
+                        aluno=request.user,
+                        tema=palavra_escolhida.tema,
+                        resultado='vitoria'
+                    )
 
                 return JsonResponse({
                     'palavra_mascarada': palavra_mascarada,
@@ -177,13 +175,13 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
             if tentativas_restantes <= 0:
                 del self.request.session['palavra_escolhida']
                 del self.request.session['erros']
-                
-                # Registro de atividade com resultado de derrota
-                Atividade.objects.create(
-                    aluno=self.request.user,
-                    tema=palavra_escolhida.tema,
-                    resultado='derrota'
-                )
+
+                if request.user.is_authenticated:
+                    Atividade.objects.create(
+                        aluno=request.user,
+                        tema=palavra_escolhida.tema,
+                        resultado='derrota'
+                    )
 
                 return JsonResponse({
                     'palavra_mascarada': palavra_mascarada,
@@ -210,7 +208,7 @@ class LosePageView(ProfessorContextMixin, TemplateView):
 
 
 
-class RelatorioAtividadeView(LoginRequiredMixin, ListView):
+class RelatorioAtividadeView(ProfessorContextMixin,  ListView):
     template_name = 'professor/relatorioAtividade.html'
     context_object_name = 'atividades'
     model = Atividade
