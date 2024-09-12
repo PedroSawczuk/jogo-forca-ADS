@@ -70,26 +70,30 @@ class DeletarTemaPageView(ProfessorContextMixin, DeleteView):
     template_name = 'professor/temas/confirmarExcluirTemas.html'
     success_url = reverse_lazy('administrarTemasPage')
 
-class AdministrarPalavrasPageView(ProfessorContextMixin, CreateView, ListView):
+class AdicionarPalavraView(ProfessorContextMixin, CreateView):
     model = Palavra
     form_class = PalavraForm
-    template_name = 'professor/palavras/palavrasPage.html'
-    success_url = reverse_lazy('administrarPalavrasPage')
-
-    def get_queryset(self):
-        temas_do_professor = Tema.objects.filter(professor=self.request.user)
-        return Palavra.objects.filter(tema__in=temas_do_professor)
+    template_name = 'professor/palavras/adicionarPalavra.html'
+    success_url = reverse_lazy('listarPalavrasPage')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        # Passa o professor autenticado para o formulário
-        form = PalavraForm(professor=self.request.user)
+        form.fields['tema'].queryset = Tema.objects.filter(professor=self.request.user)
         return form
 
     def form_valid(self, form):
         tema = get_object_or_404(Tema, pk=self.request.POST.get('tema'), professor=self.request.user)
         form.instance.tema = tema
         return super().form_valid(form)
+
+class ListarPalavrasView(ProfessorContextMixin, ListView):
+    model = Palavra
+    template_name = 'professor/palavras/listarPalavras.html'
+    context_object_name = 'object_list'
+
+    def get_queryset(self):
+        temas_do_professor = Tema.objects.filter(professor=self.request.user)
+        return Palavra.objects.filter(tema__in=temas_do_professor).order_by('palavra')
 
 class EditarPalavraPageView(ProfessorContextMixin, UpdateView):
     model = Palavra
