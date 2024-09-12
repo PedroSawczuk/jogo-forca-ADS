@@ -8,12 +8,14 @@ urlpatterns = [
     
     path('professor/', ProfessorGeralPageView.as_view(), name='professorGeralPage'),
     
-    path('professor/temas/', AdministrarTemasPageView.as_view(), name='administrarTemasPage'),
+    path('professor/temas/', ListarTemasView.as_view(), name='listarTemasPage'),
+    path('professor/temas/adicionar/', AdicionarTemaView.as_view(), name='adicionarTema'),
     path('professor/temas/editar/<int:pk>/', EditarTemaPageView.as_view(), name='editarTema'),
     path('professor/temas/deletar/<int:pk>/', DeletarTemaPageView.as_view(), name='deletarTema'),
     
-    path('professor/palavras/adicionar/', AdicionarPalavraView.as_view(), name='adicionarPalavra'),
+    
     path('professor/palavras/listar/', ListarPalavrasView.as_view(), name='listarPalavrasPage'),
+    path('professor/palavras/adicionar/', AdicionarPalavraView.as_view(), name='adicionarPalavra'),
     path('professor/palavras/editar/<int:pk>/', EditarPalavraPageView.as_view(), name='editarPalavra'),
     path('professor/palavras/deletar/<int:pk>/', DeletarPalavraPageView.as_view(), name='deletarPalavra'),
     

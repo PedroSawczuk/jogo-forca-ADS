@@ -46,29 +46,35 @@ class DesenvolvedoresPageView(ProfessorContextMixin, TemplateView):
 class ProfessorGeralPageView(ProfessorContextMixin, TemplateView):
     template_name = "professor/paginaGeral.html"
 
-class AdministrarTemasPageView(ProfessorContextMixin, CreateView, ListView):
+class ListarTemasView(ProfessorContextMixin, ListView):
     model = Tema
-    form_class = TemaForm
-    template_name = 'professor/temas/temasPage.html'
-    success_url = reverse_lazy('administrarTemasPage')
+    template_name = 'professor/temas/listarTemas.html'
+    context_object_name = 'temas'
 
     def get_queryset(self):
         return Tema.objects.filter(professor=self.request.user)
+
+class AdicionarTemaView(ProfessorContextMixin, CreateView):
+    model = Tema
+    form_class = TemaForm
+    template_name = 'professor/temas/adicionarTema.html'
+    success_url = reverse_lazy('listarTemasPage')
 
     def form_valid(self, form):
         form.instance.professor = self.request.user
         return super().form_valid(form)
 
+
 class EditarTemaPageView(ProfessorContextMixin, UpdateView):
     model = Tema
     form_class = TemaForm
     template_name = 'professor/temas/editarTemas.html'
-    success_url = reverse_lazy('administrarTemasPage')
+    success_url = reverse_lazy('listarTemasPage')
 
 class DeletarTemaPageView(ProfessorContextMixin, DeleteView):
     model = Tema
     template_name = 'professor/temas/confirmarExcluirTemas.html'
-    success_url = reverse_lazy('administrarTemasPage')
+    success_url = reverse_lazy('listarTemasPage')
 
 class AdicionarPalavraView(ProfessorContextMixin, CreateView):
     model = Palavra
@@ -99,12 +105,12 @@ class EditarPalavraPageView(ProfessorContextMixin, UpdateView):
     model = Palavra
     form_class = PalavraForm
     template_name = 'professor/palavras/editarPalavras.html'
-    success_url = reverse_lazy('administrarPalavrasPage')
+    success_url = reverse_lazy('listarPalavrasPage')
 
 class DeletarPalavraPageView(ProfessorContextMixin, DeleteView):
     model = Palavra
     template_name = 'professor/palavras/confirmarExcluirPalavras.html'
-    success_url = reverse_lazy('administrarPalavrasPage')
+    success_url = reverse_lazy('listarPalavrasPage')
 
 def normalize_accented_char(char):
     normalized_char = unicodedata.normalize('NFD', char)
