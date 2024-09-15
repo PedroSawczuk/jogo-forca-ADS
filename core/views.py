@@ -131,12 +131,15 @@ def normalize_accented_char(char):
 
 class ForcaGameView(ProfessorContextMixin, TemplateView):
     template_name = 'jogo/forcaPage.html'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        tema = get_object_or_404(Tema, pk=self.kwargs['pk'])
+        
+        # Verifique se o 'pk' foi passado corretamente pela URL
+        tema = get_object_or_404(Tema, pk=self.kwargs.get('pk'))
+        
+        # O restante da lógica permanece a mesma
         palavras = list(tema.palavras.all())
-
         palavra_escolhida_id = self.request.session.get('palavra_escolhida')
 
         if not palavra_escolhida_id:
@@ -159,6 +162,7 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
         limite_erros = 6
         tentativas_restantes = limite_erros - erros
 
+        # Adicione o tema ao contexto para poder utilizá-lo na URL
         context['tema'] = tema
         context['palavra'] = palavra_escolhida
         context['palavra_mascarada'] = palavra_mascarada if palavra_escolhida else ''
@@ -173,33 +177,48 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
             palavra_escolhida = Palavra.objects.get(id=palavra_escolhida_id)
             palavra = palavra_escolhida.palavra.lower()
 
-            palavra_mascarada = self.request.session.get('palavra_mascarada', ''.join(['_' if char != ' ' else ' ' for char in palavra]))
+            # Recupera a palavra mascarada e as letras já adivinhadas
+            palavra_mascarada = request.session.get('palavra_mascarada', ''.join(['_' if char != ' ' else ' ' for char in palavra]))
+            letras_adivinhadas = request.session.get('letras_adivinhadas', [])
             nova_palavra_mascarada = list(palavra_mascarada)
+            erros = request.session.get('erros', 0)
             mensagem = ""
 
-            erros = self.request.session.get('erros', 0)
-
+            # Normaliza acentos
             letra_normalizada = normalize_accented_char(letra)
             palavra_normalizada = normalize_accented_char(palavra)
 
-            if letra_normalizada in palavra_normalizada:
-                for idx, char in enumerate(palavra):
-                    if normalize_accented_char(char) == letra_normalizada:
-                        nova_palavra_mascarada[idx] = char
-                palavra_mascarada = ''.join(nova_palavra_mascarada)
-                self.request.session['palavra_mascarada'] = palavra_mascarada
-                mensagem = "Letra correta!"
+            # Verifica se a letra já foi adivinhada
+            if letra_normalizada in letras_adivinhadas:
+                erros += 1  # Penaliza o jogador por repetir a letra
+                mensagem = "Letra repetida! Tente outra."
             else:
-                erros += 1
-                self.request.session['erros'] = erros
-                mensagem = "Letra incorreta!"
+                letras_adivinhadas.append(letra_normalizada)  # Adiciona a letra às tentativas
 
+                if letra_normalizada in palavra_normalizada:
+                    for idx, char in enumerate(palavra):
+                        if normalize_accented_char(char) == letra_normalizada:
+                            nova_palavra_mascarada[idx] = char
+                    palavra_mascarada = ''.join(nova_palavra_mascarada)
+                    request.session['palavra_mascarada'] = palavra_mascarada
+                    mensagem = "Letra correta!"
+                else:
+                    erros += 1
+                    mensagem = "Letra incorreta!"
+
+            # Salva as letras já adivinhadas na sessão
+            request.session['letras_adivinhadas'] = letras_adivinhadas
+            request.session['erros'] = erros
+
+            # Verifica se o jogador venceu ou perdeu
             tentativas_restantes = 5 - erros
 
             if '_' not in palavra_mascarada:
-                del self.request.session['palavra_escolhida']
-                del self.request.session['erros']
+                del request.session['palavra_escolhida']
+                del request.session['erros']
+                del request.session['letras_adivinhadas']
 
+                # Registra a vitória
                 if request.user.is_authenticated:
                     Atividade.objects.create(
                         aluno=request.user,
@@ -212,13 +231,15 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
                     'tentativas_restantes': tentativas_restantes,
                     'mensagem': 'Você ganhou! Redirecionando para a página de vitória.',
                     'redirect': True,
-                    'url': self.request.build_absolute_uri(reverse('winPage'))
+                    'url': request.build_absolute_uri(reverse('winPage'))
                 })
 
             if tentativas_restantes <= 0:
-                del self.request.session['palavra_escolhida']
-                del self.request.session['erros']
+                del request.session['palavra_escolhida']
+                del request.session['erros']
+                del request.session['letras_adivinhadas']
 
+                # Registra a derrota
                 if request.user.is_authenticated:
                     Atividade.objects.create(
                         aluno=request.user,
@@ -231,7 +252,7 @@ class ForcaGameView(ProfessorContextMixin, TemplateView):
                     'tentativas_restantes': tentativas_restantes,
                     'mensagem': 'Você perdeu! Redirecionando para a página de derrota.',
                     'redirect': True,
-                    'url': self.request.build_absolute_uri(reverse('losePage'))
+                    'url': request.build_absolute_uri(reverse('losePage'))
                 })
 
             return JsonResponse({
