@@ -98,8 +98,21 @@ class ListarPalavrasView(ProfessorContextMixin, ListView):
     context_object_name = 'object_list'
 
     def get_queryset(self):
-        temas_do_professor = Tema.objects.filter(professor=self.request.user)
-        return Palavra.objects.filter(tema__in=temas_do_professor).order_by('palavra')
+        professor = self.request.user
+        tema_id = self.request.GET.get('tema')
+        
+        temas_do_professor = Tema.objects.filter(professor=professor)
+        queryset = Palavra.objects.filter(tema__in=temas_do_professor).order_by('palavra')
+
+        if tema_id:
+            queryset = queryset.filter(tema_id=tema_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['temas'] = Tema.objects.filter(professor=self.request.user)
+        return context
 
 class EditarPalavraPageView(ProfessorContextMixin, UpdateView):
     model = Palavra

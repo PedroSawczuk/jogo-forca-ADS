@@ -3,6 +3,21 @@
 {% block main %}
   <div class="container mt-4">
     <h1 class="mb-4">Lista de Palavras</h1>
+
+    <form method="get" class="mb-4">
+      <div class="form-group">
+        <label for="tema">Filtrar por Tema:</label>
+        <select name="tema" id="tema" class="form-control" onchange="this.form.submit()">
+          <option value="">Todos os Temas</option>
+          {% for tema in temas %}
+            <option value="{{ tema.id }}" {% if request.GET.tema == tema.id|stringformat:"s" %}selected{% endif %}>
+              {{ tema.nome }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+
     <a href="{% url 'adicionarPalavra' %}" class="btn btn-primary mb-3">Adicionar Nova Palavra</a>
     <div class="card">
       <div class="card-body">
@@ -12,6 +27,7 @@
               <tr>
                 <th>Palavra</th>
                 <th>Dica</th>
+                <th>Tema</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -20,6 +36,7 @@
                 <tr>
                   <td>{{ palavra.palavra }}</td>
                   <td>{{ palavra.dica }}</td>
+                  <td>{{ palavra.tema.nome }}</td>
                   <td>
                     <a href="{% url 'editarPalavra' palavra.pk %}" class="btn btn-warning btn-sm">Editar</a>
                     <a href="{% url 'deletarPalavra' palavra.pk %}" class="btn btn-danger btn-sm">Deletar</a>
