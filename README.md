@@ -48,6 +48,10 @@ Aplicação em django criado para a atividade final de Programação IV do curso
    ```
 9. E pronto, a aplicação está funcionando! :)
 
+## Site da Aplicação 🌐
+
+Você pode acessar a aplicação no seguinte link: https://tpm69.pythonanywhere.com/
+
 ## Desenvolvedores 🧑🏻‍💻
 
 - José Estevão Machado Zanetti - **2022105100017** 
