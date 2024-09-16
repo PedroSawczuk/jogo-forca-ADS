@@ -50,6 +50,6 @@ Aplicação em django criado para a atividade final de Programação IV do curso
 
 ## Desenvolvedores 🧑🏻‍💻
 
-- **José Estevão Machado Zanetti**
-- **Pedro Henrique Sawczuk Monteiro**
-- **Reginaldo Cardoso de Oliveira Júnior**
+- José Estevão Machado Zanetti - **2022105100017** 
+- Pedro Henrique Sawczuk Monteiro - **2022105100002**
+- Reginaldo Cardoso de Oliveira Júnior - **2022105100027**
