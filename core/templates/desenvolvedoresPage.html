@@ -2,49 +2,40 @@
 
 {% load static %} 
 
-{% block title %}Desenvolvedores{%endblock title %}
+{% block title %}Desenvolvedores{% endblock title %}
 
 {% block main %}
-<div class="container">
-  <h1 class="text-center mb-4" style="margin: .5em 0 .5em 0;">Equipe de Desenvolvimento</h1>
+<div class="container mx-auto py-12 px-6">
+  <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Equipe de Desenvolvimento</h1>
 
-  <div class="row justify-content-center">
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-      <div class="card" style="width: 100%">
-        <img
-          class="card-img-top"
-          src="https://i.ibb.co/3BvvzSn/jose-estevao.jpg"
-          alt="Imagem do Tevinpvp"
-        />
-        <div class="card-body">
-          <h5 class="card-title text-center">José Estevão</h5>
-        </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden max-w-sm">
+      <img 
+        class="w-full h-64 object-cover" 
+        src="https://i.ibb.co/3BvvzSn/jose-estevao.jpg" 
+        alt="Imagem de José Estevão" />
+      <div class="p-6 text-center">
+        <h5 class="text-xl font-semibold text-gray-800">José Estevão</h5>
       </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-      <div class="card" style="width: 100%">
-        <img
-          class="card-img-top"
-          src="https://i.ibb.co/txbcYH3/pedro-sawczuk.jpg"
-          alt="Imagem do Pedrinpvp"
-        />
-        <div class="card-body">
-          <h5 class="card-title text-center">Pedro Sawczuk</h5>
-        </div>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden max-w-sm">
+      <img 
+        class="w-full h-64 object-cover" 
+        src="https://i.ibb.co/txbcYH3/pedro-sawczuk.jpg" 
+        alt="Imagem de Pedro Sawczuk" />
+      <div class="p-6 text-center">
+        <h5 class="text-xl font-semibold text-gray-800">Pedro Sawczuk</h5>
       </div>
     </div>
 
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-      <div class="card" style="width: 100%">
-        <img
-          class="card-img-top"
-          src="https://i.ibb.co/XZ7qwGc/reginaldo-junior.jpg"
-          alt="Imagem do Junipvp"
-        />
-        <div class="card-body">
-          <h5 class="card-title text-center">Reginaldo Cardoso</h5>
-        </div>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden max-w-sm">
+      <img 
+        class="w-full h-64 object-cover" 
+        src="https://i.ibb.co/XZ7qwGc/reginaldo-junior.jpg" 
+        alt="Imagem de Reginaldo Cardoso" />
+      <div class="p-6 text-center">
+        <h5 class="text-xl font-semibold text-gray-800">Reginaldo Cardoso</h5>
       </div>
     </div>
   </div>

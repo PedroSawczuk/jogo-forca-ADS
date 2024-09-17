@@ -5,11 +5,13 @@
 {% endblock title %}
 
 {% block main %}
-<div class="container mt-5">
-  <div class="text-center mb-4">
-    <h1 class="display-3 text-success">Parabéns!</h1>
-    <p class="lead">Você acertou todas as letras!</p>
-    <a href="{% url 'homePage' %}" class="btn btn-primary btn-lg">Voltar ao Início</a>
+<div class="container mx-auto py-12 px-6">
+  <div class="text-center mb-8">
+    <h1 class="text-5xl font-bold text-green-600 mb-4">Parabéns!</h1>
+    <p class="text-xl text-gray-700 mb-6">Você acertou todas as letras!</p>
+    <a href="{% url 'homePage' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+      Voltar ao Início
+    </a>
   </div>
 </div>
 {% endblock main %}

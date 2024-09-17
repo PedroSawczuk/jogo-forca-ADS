@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block main %}
-  <div class="container mt-4">
-    <h2 class="mb-4">Adicionar Palavra</h2>
-    <form method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
-      {% csrf_token %}
-      <div class="form-group">
-        {{ form.as_p }}
-      </div>
-      <button type="submit" class="btn btn-primary">Salvar</button>
-      <a href="{% url 'listarPalavrasPage' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
-  </div>
+<div class="container mx-auto py-12 px-6">
+  <h2 class="text-2xl font-bold mb-6">Adicionar Palavra</h2>
+  <form method="post" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg p-6">
+    {% csrf_token %}
+    <div class="mb-4">
+      {{ form.as_p }}
+    </div>
+    <div class="flex justify-end gap-4">
+      <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300">Salvar</button>
+      <a href="{% url 'listarPalavrasPage' %}" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">Cancelar</a>
+    </div>
+  </form>
+</div>
 {% endblock %}

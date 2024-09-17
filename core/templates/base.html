@@ -6,71 +6,199 @@
     <title>{% block title %} {% endblock title %}</title>
 
     <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
   </head>
-  <body>  
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="{% url 'homePage' %}">Jogo da Forca ADS</a>
-      
-      <!-- Botão de colapso (hamburger) para dispositivos menores -->
-      <button 
-        class="navbar-toggler" 
-        type="button" 
-        data-toggle="collapse" 
-        data-target="#navbarNav" 
-        aria-controls="navbarNav" 
-        aria-expanded="false" 
-        aria-label="Toggle navigation"
+  <body class="bg-gray-100">
+    <nav class="bg-gray-800 text-white p-4">
+      <div
+        class="container mx-auto flex flex-wrap items-center justify-between"
       >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <!-- Links da navbar -->
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link text-white" href="{% url 'homePage' %}">Página Inicial</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-white" href="{% url 'desenvolvedoresPage' %}">Desenvolvedores</a>
-          </li>
+        <a
+          href="{% url 'homePage' %}"
+          class="text-xl font-bold hover:text-yellow-400"
+          >Jogo da Forca ADS</a
+        >
 
-          {% if user.is_authenticated %} 
-            {% if is_professor %}
-              <li class="nav-item">
-                <a class="btn btn-warning" href="{% url 'professorGeralPage' %}" style="margin-right: 0.5em">
-                  Administrar Temas
-                </a>
-              </li>
+        <div class="block lg:hidden">
+          <button id="navbar-toggler" class="text-white focus:outline-none">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <div id="navbarNav" class="hidden lg:flex lg:items-center lg:space-x-6">
+          <ul
+            class="flex flex-col lg:flex-row lg:space-x-6 space-y-2 lg:space-y-0 items-center"
+          >
+            <li class="flex items-center">
+              <a href="{% url 'homePage' %}" class="hover:text-yellow-400"
+                >Página Inicial</a
+              >
+            </li>
+            <li class="flex items-center">
+              <a
+                href="{% url 'desenvolvedoresPage' %}"
+                class="hover:text-yellow-400"
+                >Desenvolvedores</a
+              >
+            </li>
+
+            {% if user.is_authenticated %} {% if is_professor %}
+            <li class="flex items-center">
+              <a
+                href="{% url 'professorGeralPage' %}"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg"
+              >
+                Administrar Temas
+              </a>
+            </li>
             {% endif %}
-            <li class="nav-item">
-              <a class="btn btn-light" href="{% url 'homePage' %}" style="margin-right: 0.5em">
+            <li class="flex items-center">
+              <a
+                href="{% url 'homePage' %}"
+                class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300"
+              >
                 {{ user.username }}
               </a>
             </li>
-            <li class="nav-item">
-              <form action="{% url 'logout' %}" method="post" class="form-inline">
+            <li class="flex items-center">
+              <form
+                action="{% url 'logout' %}"
+                method="post"
+                class="inline-block"
+              >
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Logout</button>
+                <button
+                  type="submit"
+                  class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
+                >
+                  Logout
+                </button>
               </form>
             </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="btn btn-success" href="{% url 'signin' %}">Entrar</a>
+            {% else %}
+            <li class="flex items-center">
+              <a
+                href="{% url 'signin' %}"
+                class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg"
+              >
+                Entrar
+              </a>
             </li>
-          {% endif %}
-        </ul>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div
+          id="mobileMenu"
+          class="lg:hidden fixed top-0 left-0 w-full bg-gray-800 text-white p-4 flex flex-col space-y-4 z-50 hidden"
+        >
+          <button id="close-menu" class="self-end text-white">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+          <ul class="space-y-4">
+            <li>
+              <a href="{% url 'homePage' %}" class="block hover:text-yellow-400"
+                >Página Inicial</a
+              >
+            </li>
+            <li>
+              <a
+                href="{% url 'desenvolvedoresPage' %}"
+                class="block hover:text-yellow-400"
+                >Desenvolvedores</a
+              >
+            </li>
+
+            {% if user.is_authenticated %} {% if is_professor %}
+            <li>
+              <a
+                href="{% url 'professorGeralPage' %}"
+                class="block bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg"
+              >
+                Administrar Temas
+              </a>
+            </li>
+            {% endif %}
+            <li>
+              <a
+                href="{% url 'homePage' %}"
+                class="block bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300"
+              >
+                {{ user.username }}
+              </a>
+            </li>
+            <li>
+              <form
+                action="{% url 'logout' %}"
+                method="post"
+                class="inline-block"
+              >
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
+                >
+                  Logout
+                </button>
+              </form>
+            </li>
+            {% else %}
+            <li>
+              <a
+                href="{% url 'signin' %}"
+                class="block bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg"
+              >
+                Entrar
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
       </div>
     </nav>
-    
-    {% block main %} {% endblock main %}
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <main class="py-8">{% block main %} {% endblock main %}</main>
+
+    <script>
+      const navbarToggler = document.getElementById("navbar-toggler");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const closeMenu = document.getElementById("close-menu");
+
+      navbarToggler.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      closeMenu.addEventListener("click", () => {
+        mobileMenu.classList.add("hidden");
+      });
+    </script>
   </body>
 </html>
-  

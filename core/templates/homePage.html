@@ -5,50 +5,58 @@
 {% endblock title %}
 
 {% block main %}
-<div class="container">
-  <h1 class="text-center mb-4">Jogo da Forca ADS</h1>
+<div class="container mx-auto py-8 px-4">
+  <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Jogo da Forca ADS</h1>
 
   <!-- Formulário de Filtro -->
-  <form method="get" class="mb-4">
-    <div class="form-row">
-      <div class="col-md-4 mb-2">
-        <label for="professor">Professor</label>
-        <select id="professor" name="professor" class="form-control">
+  <form method="get" class="mb-8 bg-white p-6 rounded-lg shadow-md">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <label for="professor" class="block text-gray-700 font-medium mb-2">Professor</label>
+        <select id="professor" name="professor" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:ring-yellow-500">
           <option value="">-- Todos os Professores --</option>
           {% for professor in professores %}
-            <option value="{{ professor.id }}" {% if request.GET.professor == professor.id|stringformat:"s" %}selected{% endif %}>{{ professor.username }}</option>
+            <option value="{{ professor.id }}" {% if request.GET.professor == professor.id|stringformat:"s" %}selected{% endif %}>
+              {{ professor.username }}
+            </option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-4 mb-2">
-        <label for="tema">Tema</label>
-        <select id="tema" name="tema" class="form-control">
+
+      <div>
+        <label for="tema" class="block text-gray-700 font-medium mb-2">Tema</label>
+        <select id="tema" name="tema" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring focus:ring-yellow-500">
           <option value="">-- Todos os Temas --</option>
           {% for tema in temas %}
-            <option value="{{ tema.id }}" {% if request.GET.tema == tema.id|stringformat:"s" %}selected{% endif %}>{{ tema.nome }}</option>
+            <option value="{{ tema.id }}" {% if request.GET.tema == tema.id|stringformat:"s" %}selected{% endif %}>
+              {{ tema.nome }}
+            </option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-4 mb-2">
-        <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+
+      <div class="flex items-end">
+        <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-md transition duration-300">
+          Filtrar
+        </button>
       </div>
     </div>
   </form>
 
-  <div class="row justify-content-center">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for tema in temas %}
-    <div class="col-md-4">
-      <div class="card mb-4">
-        <div class="card-body text-center">
-          <h5 class="card-title">{{ tema.nome }}</h5>
-          <p class="card-text">{{ tema.descricao }}</p>
-          <p class="card-text"><small class="text-muted">Professor: {{ tema.professor.username }}</small></p>
-          <a href="{% url 'temaDetalhes' tema.id %}" class="btn btn-primary">Sobre o Tema</a>
-        </div>
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+      <div class="p-6 text-center">
+        <h5 class="text-xl font-semibold mb-2 text-gray-800">{{ tema.nome }}</h5>
+        <p class="text-gray-600 mb-4">{{ tema.descricao }}</p>
+        <p class="text-sm text-gray-500 mb-4">Professor: {{ tema.professor.username }}</p>
+        <a href="{% url 'temaDetalhes' tema.id %}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-300">
+          Sobre o Tema
+        </a>
       </div>
     </div>
     {% empty %}
-    <p class="text-center">Nenhum tema disponível no momento.</p>
+    <p class="text-center col-span-full text-gray-700">Nenhum tema disponível no momento.</p>
     {% endfor %}
   </div>
 </div>

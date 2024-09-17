@@ -2,15 +2,19 @@
 {% block title %} Confirmar Exclusão {% endblock title %}
 
 {% block main %}
-<div class="container">
-  <h1 class="text-center mb-4">Confirmar Exclusão</h1>
+<div class="container mx-auto py-12 px-6">
+  <h1 class="text-3xl font-bold mb-6 text-center">Confirmar Exclusão</h1>
 
-  <p>Tem certeza que deseja excluir a palavra "{{ object.palavra }}"?</p>
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <p class="text-lg mb-6 text-center">Tem certeza que deseja excluir a palavra <strong>"{{ object.palavra }}"</strong>?</p>
 
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Sim, excluir</button>
-    <a href="{% url 'adicionarPalavra' %}" class="btn btn-secondary">Cancelar</a>
-  </form>
+    <div class="flex justify-center gap-4">
+      <form method="post" class="flex items-center">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-700 transition duration-300">Sim, excluir</button>
+      </form>
+      <a href="{% url 'listarPalavrasPage' %}" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">Cancelar</a>
+    </div>
+  </div>
 </div>
 {% endblock main %}

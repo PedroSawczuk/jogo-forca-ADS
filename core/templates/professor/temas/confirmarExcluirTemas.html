@@ -2,17 +2,21 @@
 {% block title %} Confirmar Exclusão {% endblock title %}
 
 {% block main %}
-<div class="container">
-  <h1 class="text-center mb-4">Confirmar Exclusão</h1>
+<div class="container mx-auto py-12 px-6">
+  <h1 class="text-3xl font-bold text-center mb-8">Confirmar Exclusão</h1>
 
   <!-- Confirmação para exclusão de tema -->
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <p>Você tem certeza de que deseja excluir o tema "{{ object.nome }}"?</p>
-      <form method="post">
+  <div class="flex justify-center">
+    <div class="w-full max-w-md bg-white shadow-md rounded-lg p-8">
+      <p class="text-lg mb-6">Você tem certeza de que deseja excluir o tema "<strong>{{ object.nome }}</strong>"?</p>
+      <form method="post" class="flex justify-between">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Excluir</button>
-        <a href="{% url 'listarTemasPage' %}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 transition duration-300">
+          Excluir
+        </button>
+        <a href="{% url 'listarTemasPage' %}" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
+          Cancelar
+        </a>
       </form>
     </div>
   </div>
